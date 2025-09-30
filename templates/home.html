@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Google Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 3s infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .btn-hover {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-hover:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: all 0.5s;
+        }
+        
+        .btn-hover:hover:before {
+            left: 100%;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.6s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen flex items-center justify-center p-4 font-sans">
+    <!-- Floating Background Elements -->
+    <div class="fixed top-10 left-10 w-20 h-20 bg-white opacity-10 rounded-full animate-float"></div>
+    <div class="fixed top-1/4 right-20 w-16 h-16 bg-white opacity-10 rounded-full animate-float" style="animation-delay: 0.5s;"></div>
+    <div class="fixed bottom-20 left-1/4 w-24 h-24 bg-white opacity-10 rounded-full animate-float" style="animation-delay: 1s;"></div>
+    <div class="fixed bottom-10 right-10 w-12 h-12 bg-white opacity-10 rounded-full animate-float" style="animation-delay: 1.5s;"></div>
+    
+    <div class="w-full max-w-md bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden card-hover fade-in">
+        <div class="bg-gradient-to-r from-primary-500 to-primary-700 p-6 text-center relative overflow-hidden">
+            <!-- Animated background elements in header -->
+            <div class="absolute top-0 left-0 w-full h-full opacity-10">
+                <div class="absolute top-4 left-4 w-8 h-8 bg-white rounded-full animate-pulse-slow"></div>
+                <div class="absolute bottom-4 right-4 w-6 h-6 bg-white rounded-full animate-pulse-slow" style="animation-delay: 0.5s;"></div>
+            </div>
+            
+            <h1 class="text-2xl font-bold text-white relative z-10">Flask Google Login</h1>
+            <p class="text-white mt-2 relative z-10">Secure authentication with Google</p>
+            
+            <!-- Decorative icon -->
+            <div class="absolute -bottom-4 -right-4 w-20 h-20 bg-white/10 rounded-full flex items-center justify-center">
+                <i class="fas fa-shield-alt text-white/30 text-2xl"></i>
+            </div>
+        </div>
+        
+        <div class="p-6">
+            {% if user %}
+                <!-- User Profile Section -->
+                <div class="text-center mb-6 slide-in">
+                    <div class="relative inline-block">
+                        <div class="absolute -inset-2 bg-gradient-to-r from-primary-400 to-purple-500 rounded-full blur opacity-30 animate-pulse"></div>
+                        <img src="{{ user['picture'] }}" alt="Profile Picture" class="w-24 h-24 rounded-full mx-auto border-4 border-white shadow-lg relative z-10">
+                    </div>
+                    <h2 class="text-xl font-bold mt-4 text-gray-800">Welcome, {{ user['name'] }}!</h2>
+                    <p class="text-gray-600 mt-1 flex items-center justify-center">
+                        <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                        You're successfully signed in
+                    </p>
+                </div>
+                
+                <!-- User Information Table -->
+                <div class="bg-gradient-to-br from-gray-50 to-white rounded-xl p-4 mb-6 border border-gray-200 shadow-sm slide-in" style="animation-delay: 0.2s;">
+                    <h3 class="font-semibold text-gray-700 mb-3 flex items-center">
+                        <i class="fas fa-user-circle text-primary-500 mr-2"></i>
+                        Profile Information
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center border-b border-gray-200 pb-2 transition-all hover:bg-gray-50 px-2 rounded">
+                            <span class="text-gray-600 font-medium flex items-center">
+                                <i class="fas fa-id-card text-gray-400 mr-2 text-sm"></i>
+                                ID
+                            </span>
+                            <span class="text-gray-800 font-mono text-sm bg-gray-100 px-2 py-1 rounded">{{ user['id'] }}</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-200 pb-2 transition-all hover:bg-gray-50 px-2 rounded">
+                            <span class="text-gray-600 font-medium flex items-center">
+                                <i class="fas fa-user text-gray-400 mr-2 text-sm"></i>
+                                Name
+                            </span>
+                            <span class="text-gray-800">{{ user['name'] }}</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-200 pb-2 transition-all hover:bg-gray-50 px-2 rounded">
+                            <span class="text-gray-600 font-medium flex items-center">
+                                <i class="fas fa-envelope text-gray-400 mr-2 text-sm"></i>
+                                Email
+                            </span>
+                            <span class="text-gray-800">{{ user['email'] }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex space-x-3 slide-in" style="animation-delay: 0.4s;">
+                    <a href="{{ url_for('logout') }}" class="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center btn-hover shadow-md">
+                        <i class="fas fa-sign-out-alt mr-2"></i>
+                        Logout
+                    </a>
+                </div>
+            {% else %}
+                <!-- Login Section -->
+                <div class="text-center py-4">
+                    <div class="relative inline-block mb-4">
+                        <div class="absolute -inset-4 bg-gradient-to-r from-primary-400 to-purple-500 rounded-full blur opacity-30 animate-pulse"></div>
+                        <div class="bg-gradient-to-br from-primary-500 to-primary-700 rounded-full w-20 h-20 flex items-center justify-center mx-auto relative z-10 shadow-lg">
+                            <i class="fas fa-lock text-white text-2xl"></i>
+                        </div>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome</h2>
+                    <p class="text-gray-600 mb-6">Sign in to access your account</p>
+                    
+                    <a href="{{ url_for('login') }}" class="w-full bg-white border border-gray-300 hover:border-primary-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center shadow-sm btn-hover mb-4">
+                        <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" class="w-5 h-5 mr-3">
+                        Sign in with Google
+                    </a>
+                    
+                    <div class="mt-6 text-xs text-gray-500">
+                        <p>By continuing, you agree to our <a href="#" class="text-primary-500 hover:underline">Terms of Service</a> and <a href="#" class="text-primary-500 hover:underline">Privacy Policy</a></p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Footer -->
+        <div class="bg-gradient-to-r from-gray-100 to-gray-200 p-4 text-center text-gray-500 text-sm">
+            <p>© 2023 Flask Google Login Demo. All rights reserved.</p>
+        </div>
+    </div>
+    
+    <script>
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effect to profile card
+            const profileCard = document.querySelector('.bg-gradient-to-br');
+            if (profileCard) {
+                profileCard.addEventListener('mouseenter', function() {
+                    this.classList.add('shadow-md');
+                });
+                profileCard.addEventListener('mouseleave', function() {
+                    this.classList.remove('shadow-md');
+                });
+            }
+            
+            // Add ripple effect to buttons
+            const buttons = document.querySelectorAll('.btn-hover');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size/2;
+                    const y = e.clientY - rect.top - size/2;
+                    
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.classList.add('ripple');
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+        });
+    </script>
+    
+    <style>
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.7);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+        }
+        
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    </style>
+</body>
+</html>
